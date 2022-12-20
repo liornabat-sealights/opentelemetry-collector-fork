@@ -1,0 +1,42 @@
+# github.com/go-task/task
+
+version: '3'
+
+
+
+tasks:
+  default:
+    cmds:
+      - task: run
+  check_update:
+    cmds:
+      - go-mod-upgrade
+  lint:
+    cmds:
+      - golangci-lint run --disable gocritic --enable misspell --enable gosec
+  builder:
+    dir: ./cmd/builder
+    cmds:
+      - go mod tidy
+      - go build -o builder.exe
+  build:
+    dir: ./build
+    cmds:
+      - builder.exe --config build-config.yaml  --output-path=./ --name=../otelcol.exe
+  run:
+    cmds:
+      - ./otelcol.exe --config ./config.yaml
+  jeager:
+    cmds:
+      - docker run -d --name jaeger -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14250:14250 -p 9411:9411  jaegertracing/all-in-one:latest
+  release:
+     dir: ./cmd/builder
+     cmds:
+       - ./builder --config build-config.yaml --output-path=./output/slauth --name=sl-exporter
+  docker:
+    dir: ./cmd/builder
+    cmds:
+      - docker build -f output/slauth/Dockerfile -t sl-exporter:latest ./output/slauth
+  dockerrun:
+    cmds:
+      - docker run -d -p 4317:4317 sl-exporter:latest

@@ -1,0 +1,10 @@
+# github.com/go-task/task
+
+version: '3'
+
+
+
+tasks:
+  default:
+    cmds:
+      - go run main.go

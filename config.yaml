@@ -1,0 +1,41 @@
+extensions:
+  slauth:
+    issuer_url: "https://dev-integ-k3d-rca-gw.dev.sealights.co/api/v1/token/agent/validate"
+    issuer_url_verb: "GET"
+    log_file_enabled: true
+    time_expiration_min: 8h
+    cleanup_interval_min: 24h
+    consumer_id_field_name: "consumerId"
+    agent_instance_id_field_name: "agentInstanceId"
+receivers:
+  otlp:
+    protocols:
+      http:
+        auth:
+          authenticator: slauth
+      grpc:
+        auth:
+          authenticator: slauth
+processors:
+  slprocessor:
+    consumer_id_field_name: "consumerId"
+    agent_instance_id_field_name: "agentInstanceId"
+    agent_cache_expiration_min: "5"
+    agent_cache_cleanup_interval: "10"
+exporters:
+#  otlp:
+#    endpoint: promscale-connector.dbs:9204
+#    tls:
+#      insecure: true
+  jaeger/2:
+    endpoint: "localhost:14250"
+    tls:
+      insecure: true
+service:
+  extensions: [slauth]
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors: [slprocessor]
+      exporters: [jaeger/2]

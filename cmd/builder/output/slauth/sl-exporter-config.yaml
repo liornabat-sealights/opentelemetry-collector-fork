@@ -1,0 +1,41 @@
+extensions:
+  slauth:   
+    issuer_url: "https://dev-risk-management-gw.dev.sealights.co/api/v1/token/agent/validate"
+    issuer_url_verb: "GET"
+    log_file_enabled: false
+    time_expiration_min: 8h
+    cleanup_interval_min: 24h
+    consumer_id_field_name: "consumerId"
+    agent_instance_id_field_name: "agentInstanceId"
+receivers:
+  otlp:
+    protocols:
+      http:
+        auth:
+          authenticator: slauth
+      grpc:
+        auth:
+          authenticator: slauth
+processors:
+  slprocessor:
+    consumer_id_field_name: "consumerId"
+    agent_instance_id_field_name: "agentInstanceId"
+    agent_cache_expiration_min: 5
+    agent_cache_cleanup_interval: 10        
+exporters:
+  otlp:
+    endpoint: sl-promscale-connector:9204
+    tls:
+      insecure: true
+  jaeger:
+    endpoint: "sl-jaeger-collector:14250"
+    tls:
+      insecure: true
+service:
+  extensions: [slauth]
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors: [slprocessor]
+      exporters: [otlp,jaeger]

@@ -1,0 +1,23 @@
+dist:
+  name: otlecol
+  description: "Basic OTel Collector distribution for Developers"
+  output_path: ../bin
+
+exporters:
+  - gomod: "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/jaegerexporter v0.67.0"
+  - import: go.opentelemetry.io/collector/exporter/otlpexporter
+    gomod: go.opentelemetry.io/collector v0.67.0
+receivers:
+  - import: go.opentelemetry.io/collector/receiver/otlpreceiver
+    gomod: go.opentelemetry.io/collector v0.67.0
+
+extensions:
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/slauth v0.0.0
+    path:  ../../extension/slauth
+processors:
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/slprocessor v0.0.0
+    path: ../../processor/slprocessor
+
+replaces:
+  - go.opentelemetry.io/collector/receiver/otlpreceiver => go.opentelemetry.io/collector/receiver/otlpreceiver v0.67.0
+  - go.opentelemetry.io/collector/exporter/otlpexporter => go.opentelemetry.io/collector/exporter/otlpexporter v0.67.0

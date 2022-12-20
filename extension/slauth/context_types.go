@@ -1,0 +1,5 @@
+package slauth
+
+type ContextKeyConsumerIdFieldName string
+type ContextKeyAgentInstanceId string
+type ContextKeyIgnoreSpan string
